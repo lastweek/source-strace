@@ -320,6 +320,7 @@ call_summary_pers(FILE *outf)
 
 	struct timespec tv_cum = zero_ts;
 	const struct timespec *tv_min = &max_ts;
+	const struct timespec *tv_min_max = &zero_ts;
 	const struct timespec *tv_max = &zero_ts;
 	uint64_t call_cum = 0;
 	uint64_t error_cum = 0;
@@ -342,6 +343,7 @@ call_summary_pers(FILE *outf)
 
 		ts_add(&tv_cum, &tv_cum, &counts[i].time);
 		tv_min = ts_min(tv_min, &counts[i].time_min);
+		tv_min_max = ts_max(tv_min_max, &counts[i].time_min);
 		tv_max = ts_max(tv_max, &counts[i].time_max);
 		call_cum += counts[i].calls;
 		error_cum += counts[i].errors;
@@ -363,7 +365,7 @@ call_summary_pers(FILE *outf)
 		W_(CSC_TIME_100S,  sizeof("100.00") - 1),
 		W_(CSC_TIME_TOTAL, num_chars("%.6f", float_tv_cum)),
 		W_(CSC_TIME_MIN,   num_chars("%" PRId64 ".000000",
-					     (int64_t) tv_min->tv_sec)),
+					     (int64_t) tv_min_max->tv_sec)),
 		W_(CSC_TIME_MAX,   num_chars("%" PRId64 ".000000",
 					     (int64_t) tv_max->tv_sec)),
 		W_(CSC_TIME_AVG,   num_chars("%" PRIu64,
